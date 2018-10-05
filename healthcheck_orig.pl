@@ -15,6 +15,7 @@ use constant SUCCESS => 'Success';
 
 $v ||= 0;
 
+my $_parent_pid = $$;
 my $config = HealthcheckConfig->new;
 
 
@@ -86,7 +87,7 @@ sub get_snippets {
 }
 sub get_temp_file {
     my $node = shift;
-    return $config->tmp_dir . '/' . $$ . '_' . $node . '.part';
+    return $config->tmp_dir . '/' . $_parent_pid . '_' . $node . '.part';
 }
 
 sub get_healthcheck_data {
