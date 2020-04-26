@@ -8,4 +8,6 @@ RUN echo 'alias ll="ls -al"' >> ~/.bashrc;
 RUN cpanm install Plack
 RUN cpanm install JSON::XS
 
-CMD perl /code/randomly_create_touch_file.pl; plackup /code/healthcheck.psgi
+COPY code /code
+
+CMD perl /code/randomly_create_touch_file.pl; plackup --port 80 /code/healthcheck.psgi
