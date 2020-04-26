@@ -11,9 +11,13 @@ my $app = sub {
     chomp($hostname);
     sleep(int(rand(10)));
 
+    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    # Any code greater than or equal to 200 and less than 400 indicates success. Any other code indicates failure.
+    my $response_code = 200;
     my $overall_status = 'Failure';
     my $description = "$in_service_file DOES NOT exists";
     if (-e $in_service_file) {
+        $response_code = 200;
         $overall_status = 'Success';
         $description = "$in_service_file exists";
     }
@@ -63,7 +67,7 @@ my $app = sub {
     );
 
     return [
-        '200',
+        $response_code,
         [ 'Content-Type' => 'application/json' ],
         [ encode_json(\%body) ],
     ];
