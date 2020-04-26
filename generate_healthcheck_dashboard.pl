@@ -30,7 +30,12 @@ my $run_touch_file = $ENV{PMP_BASE_DIR} . '/.run_healthcheck_concurrent';
 
 do {
     my $config = HealthcheckConfig->new;
-    my $concurrent = Jundy::Concurrent->new(unmarshall => \&decode_json, verbose => $v, max_children => $m);
+    my $concurrent = Jundy::Concurrent->new(
+        clear_data_on_get => 1,
+        max_children      => $m,
+        unmarshall        => \&decode_json,
+        verbose           => $v,
+    );
 
     foreach my $ip ($config->nodes) {
         $concurrent->register(\&child_process, $config->healthcheck_uri_template(), $ip, $config->max_curl_timeout());
@@ -39,7 +44,6 @@ do {
 
     open(my $fh, '>', $config->output_file('cc_')) || die("Unable to open file (" . $config->output_file('cc_') . ") for write: $!\n");
     print $fh build_page($config, $concurrent->get_data);
-    $concurrent->clear_data;
     close($fh);
     $config->print_execution_time;
     if ($config->get_execution_time() < 5) {
