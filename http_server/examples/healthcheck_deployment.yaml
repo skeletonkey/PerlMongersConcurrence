@@ -1,0 +1,28 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-healthcheck-deployment
+spec:
+  replicas: 20
+  selector:
+    matchLabels:
+      app: mock-healthcheck
+  template:
+    metadata:
+      labels:
+        app: mock-healthcheck
+    spec:
+      containers:
+        -
+          image: "erik2029/mock_healthcheck_server:v0.0.3"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            periodSeconds: 5
+          name: mock-healthcheck-server
+          ports:
+            -
+              containerPort: 80
