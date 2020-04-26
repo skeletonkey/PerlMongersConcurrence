@@ -12,13 +12,14 @@ sub new {
     shift;
     return $INSTANCE || do {
         $INSTANCE = bless({
-            max_children     => 0,
-            unmarshall       => undef,
-            verbose          => 0,
+            max_children      => 0,
+            unmarshall        => undef,
+            verbose           => 0,
+            clear_data_on_get => 0,
             @_,
-            _children        => {},
-            _child_count     => 0,
-            _future_children => []
+            _children         => {},
+            _child_count      => 0,
+            _future_children  => []
         }, __PACKAGE__);
 
         die("unmarshall needs to be a code reference\n") if defined $INSTANCE->{unmarshall} && ref($INSTANCE->{unmarshall}) ne 'CODE';
@@ -58,9 +59,21 @@ sub wait {
     }
 }
 
+sub clear_data {
+    my $self = shift;
+    delete $self->{_child_data};
+}
+
 sub get_data {
     my $self = shift;
-    return $self->{_child_data};
+    if ($self->{clear_data_on_get}) {
+        my $child_data = $self->{_child_data};
+        $self->clear_data;
+        return $child_data;
+    }
+    else {
+        return $self->{_child_data};
+    }
 }
 
 sub reaper_of_children {
